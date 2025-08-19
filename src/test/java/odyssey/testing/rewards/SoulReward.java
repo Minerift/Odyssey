@@ -3,7 +3,7 @@ package odyssey.testing.rewards;
 import odyssey.Odyssey;
 import odyssey.testing.MineriftProfile;
 
-public class SoulReward extends Odyssey.Reward {
+public class SoulReward extends Odyssey.Reward<MineriftProfile> {
 
     private int amount;
 
@@ -12,10 +12,7 @@ public class SoulReward extends Odyssey.Reward {
     }
 
     @Override
-    public void giveReward(Odyssey.WrappedProfile wrappedProfile) {
-
-        MineriftProfile profile = wrappedProfile.unwrap();
+    public void giveReward(MineriftProfile profile) {
         profile.souls += amount;
-
     }
 }

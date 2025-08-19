@@ -1,6 +1,8 @@
 package odyssey.testing;
 
-public class MineriftProfile {
+import odyssey.Odyssey;
+
+public class MineriftProfile implements Odyssey.Profile {
 
     public String name;
     public int age;

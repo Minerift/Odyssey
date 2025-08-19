@@ -3,7 +3,7 @@ package odyssey.testing.requirements;
 import odyssey.Odyssey;
 import odyssey.testing.MineriftProfile;
 
-public class GoldRequirement extends Odyssey.Requirement {
+public class GoldRequirement extends Odyssey.Requirement<MineriftProfile> {
 
     private int goldRequired;
 
@@ -12,23 +12,15 @@ public class GoldRequirement extends Odyssey.Requirement {
     }
 
     @Override
-    public boolean meetsRequirement(Odyssey.WrappedProfile wrappedProfile) {
-
-        // Get profile
-        MineriftProfile profile = wrappedProfile.unwrap();
-
+    public boolean isMet(MineriftProfile profile) {
         // Check whether player has enough gold
         return profile.gold >= goldRequired;
     }
 
     @Override
-    public void takeRequirement(Odyssey.WrappedProfile wrappedProfile) {
-
-        // Get profile
-        MineriftProfile profile = wrappedProfile.unwrap();
+    public void complete(MineriftProfile profile) {
 
         // Deduct gold
         profile.gold -= goldRequired;
-
     }
 }
