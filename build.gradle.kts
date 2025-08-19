@@ -3,13 +3,14 @@ plugins {
 }
 
 repositories {
-    mavenLocal()
+    mavenCentral()
     maven {
         url = uri("https://hub.spigotmc.org/nexus/content/repositories/snapshots/")
     }
 }
 
 dependencies {
+    implementation(libs.unimi.fastutil)
     compileOnly(libs.spigot.api)
 }
 
