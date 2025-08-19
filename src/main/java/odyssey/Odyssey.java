@@ -1,60 +1,77 @@
 package odyssey;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import it.unimi.dsi.fastutil.ints.Int2ObjectArrayMap;
+import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 
-public class Odyssey<E> {
+import java.util.*;
+import java.util.function.Supplier;
 
-    // NOTE: singleton structure
-    private static Odyssey INSTANCE = null;
-    public static <F> Odyssey getLibrary() {
-        if(INSTANCE == null) INSTANCE = new Odyssey<F>();
-        return INSTANCE;
+public class Odyssey<T extends Odyssey.Profile> {
+
+    public static <T extends Profile> Odyssey<T> create() {
+        return new Odyssey<>(new HashMap<>());
+    }
+
+    public static <T extends Profile> Odyssey<T> create(Map<T, List<?>> quests) {
+        return new Odyssey<>(quests);
+    }
+
+    public Odyssey(Map<T, List<?>> quests) {
+        this.quests = quests;
     }
 
     // TODO: fix list generic
-    private Map<E, List> quests;
+    private Map<T, List<?>> quests;
 
-    private Odyssey() {
-        this.quests = new HashMap<>();
-    }
-
-    public void registerProfile(E profile) {
+    public void registerProfile(T profile) {
         quests.putIfAbsent(profile, new ArrayList<>());
     }
 
-    public static abstract class QuestInfo {
-
-        private List<Requirement> requirements;
-        private List<Reward> rewards;
+    public void registerQuest() {
 
     }
 
-    public static abstract class Requirement {
+    public static abstract class Requirement<T extends Profile> {
 
-        public abstract boolean meetsRequirement(WrappedProfile wrappedProfile);
-        public abstract void takeRequirement(WrappedProfile wrappedProfile);
-
-    }
-
-    public static abstract class Reward {
-
-        public abstract void giveReward(WrappedProfile wrappedProfile);
+        public abstract boolean isMet(T profile);
+        public abstract void complete(T profile);
 
     }
 
-    public static final class WrappedProfile {
+    public static abstract class Reward<T extends Profile> {
 
-        private Object actual;
+        public abstract void giveReward(T profile);
 
-        private WrappedProfile(Object actual) {
-            this.actual = actual;
+    }
+
+    public interface Profile {
+        // empty
+    }
+
+    public static class Builder<T extends Profile> {
+
+        private Int2ObjectMap<Quest<T>> quests;
+
+        private Builder() {
+            this.quests = new Int2ObjectArrayMap<>();
         }
 
-        public <F> F unwrap() {
-            return (F) actual;
+        public Builder<T> loadQuests(Int2ObjectMap<Quest<T>> quests) {
+            this.quests = quests;
+            return this;
+        }
+
+        public Builder<T> registerQuest() {
+
+            return this;
+        }
+
+        public Builder<T> registerQuest(Quest<T> quest) {
+            return this;
+        }
+
+        public Odyssey<T> build() {
+            return new Odyssey<>(); //FIXME
         }
 
     }
