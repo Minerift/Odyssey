@@ -1,10 +1,10 @@
 package odyssey;
 
-import it.unimi.dsi.fastutil.ints.Int2ObjectArrayMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
-import java.util.function.Supplier;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class Odyssey<T extends Odyssey.Profile> {
 
@@ -16,25 +16,52 @@ public class Odyssey<T extends Odyssey.Profile> {
         return new Odyssey<>(quests);
     }
 
-    public Odyssey(Map<T, List<?>> quests) {
-        this.quests = quests;
+    public Odyssey(Map<T, List<?>> questProgress) {
+        this.questProgress = questProgress;
     }
 
-    // TODO: fix list generic
-    private Map<T, List<?>> quests;
+    private Map<T, List<?>> questProgress; //FIXME: update
+    private QuestRegistry<T> registry;
 
     public void registerProfile(T profile) {
-        quests.putIfAbsent(profile, new ArrayList<>());
+        questProgress.putIfAbsent(profile, new ArrayList<>());
     }
 
-    public void registerQuest() {
-
+    public QuestRegistry<T> getRegistry() {
+        return registry;
     }
 
-    public static abstract class Requirement<T extends Profile> {
+    public static abstract class Requirement<T extends Profile> implements Comparable<Requirement<T>> {
+
+        protected static final AtomicInteger NEXT_ID = new AtomicInteger();
+
+        protected final int id = NEXT_ID.getAndIncrement();
 
         public abstract boolean isMet(T profile);
         public abstract void complete(T profile);
+
+        @Override
+        public int compareTo(@NotNull Requirement<T> o) {
+            return id - o.id;
+        }
+
+        // internal complete fn for additional completion
+        protected void _complete(T profile, Quest<T> quest) {
+            if(quest.isReqComplete(this)) {
+                quest.markReqComplete();
+            }
+
+            complete(profile);
+        }
+
+        // Marks complete
+        public void markComplete(T profile, Quest<T> quest) {
+            quest.registry();
+        }
+
+        /*public boolean isCompleted(T profile) {
+
+        }*/
 
     }
 
@@ -50,14 +77,14 @@ public class Odyssey<T extends Odyssey.Profile> {
 
     public static class Builder<T extends Profile> {
 
-        private Int2ObjectMap<Quest<T>> quests;
+        private QuestRegistry<T> registry;
 
         private Builder() {
-            this.quests = new Int2ObjectArrayMap<>();
+            this.registry = null; // TODO
         }
 
         public Builder<T> loadQuests(Int2ObjectMap<Quest<T>> quests) {
-            this.quests = quests;
+            //this.quests = quests;
             return this;
         }
 
@@ -71,7 +98,7 @@ public class Odyssey<T extends Odyssey.Profile> {
         }
 
         public Odyssey<T> build() {
-            return new Odyssey<>(); //FIXME
+            return new Odyssey<>(Collections.emptyMap()); //FIXME
         }
 
     }
