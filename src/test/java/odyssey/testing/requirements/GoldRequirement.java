@@ -19,7 +19,6 @@ public class GoldRequirement extends Odyssey.Requirement<MineriftProfile> {
 
     @Override
     public void complete(MineriftProfile profile) {
-
         // Deduct gold
         profile.gold -= goldRequired;
     }

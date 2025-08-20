@@ -1,57 +1,84 @@
 package odyssey;
 
+import odyssey.util.SortedList;
+
 import java.util.Collections;
 import java.util.List;
 
 public class StagedQuest<T extends Odyssey.Profile> extends Quest<T> {
 
     public static <T extends Odyssey.Profile> StagedQuest.Builder<T> builder() {
-
+        return new Builder<>();
     }
 
-    public static <T extends Odyssey.Profile> StagedQuest<T> create(String name,
-                                                                    List<Odyssey.Requirement<T>> reqs,
+    public static <T extends Odyssey.Profile> StagedQuest<T> create(Odyssey<T> odyssey,
+                                                                    String name,
+                                                                    List<Stage> stages,
                                                                     List<Odyssey.Reward<T>> rewards) {
-        return new StagedQuest<>(name, Collections.emptyList(), reqs, rewards);
+        return new StagedQuest<>(odyssey, name, Collections.emptyList(), stages, rewards);
     }
 
-    public static <T extends Odyssey.Profile> StagedQuest<T> create(String name,
+    public static <T extends Odyssey.Profile> StagedQuest<T> create(Odyssey<T> odyssey,
+                                                                    String name,
                                                                     List<String> desc,
-                                                                    List<Odyssey.Requirement<T>> reqs,
+                                                                    List<Stage> stages,
                                                                     List<Odyssey.Reward<T>> rewards) {
-        return new StagedQuest<>(name, desc, reqs, rewards);
+        return new StagedQuest<>(odyssey, name, desc, stages, rewards);
     }
 
-    private StagedQuest(String name,
+    private final List<Stage<T>> stages;
+    private StagedQuest(Odyssey<T> odyssey,
+                        String name,
                         List<String> desc,
-                        Stage[]
+                        List<Stage> stages, // consider Stage[]
                         List<Odyssey.Reward<T>> rewards) {
-        super(name, desc, /*reqs,*/ rewards);
+        super(odyssey, name, desc, rewards);
+        this.stages = Collections.unmodifiableList(stages);
     }
 
     public boolean hasCompleted(T profile) {
-        reqs.forEach();
+        //reqs.forEach();
+        return false;
     }
 
     public boolean hasCompletedStage() {
-
+        return false;
     }
 
     @Override
-    public List<Odyssey.Requirement<T>> getAllRequirements() {
-        return List.of(); // TODO
+    public SortedList<Odyssey.Requirement<T>> getAllRequirements() {
+        return new SortedList<>(); // TODO
     }
 
-    public static class Stage {
+    @Override
+    public boolean isReqComplete(Odyssey.Requirement<T> req) {
+        return false;
+    }
 
+    public static class Stage<T extends Odyssey.Profile> {
+
+        public static <T extends Odyssey.Profile> Stage<T> of(Odyssey.Requirement<T> ... reqs) {
+            return new Stage<>(reqs);
+        }
+
+        public final SortedList<Odyssey.Requirement<T>> reqs;
+
+        public Stage(Odyssey.Requirement<T>[] reqs) {
+            this.reqs = new SortedList<>(reqs.length);
+            for(Odyssey.Requirement<T> req : reqs) {
+                this.reqs.add(req);
+            }
+        }
     }
 
     public static class Stages {
         private List<Stage> stages;
-        private
+        //private
     }
 
     public static class Builder<T extends Odyssey.Profile> {
+
+        private Stage<T>[] stages;
 
         private Builder() {
 
